@@ -8,9 +8,9 @@ def pascal_triangle(n):
 
     Args:
     - n (int): the number of rows in the triangle to generate.
-    
     Returns:
-    - triangle : a list of n sublists, each containing the integers in the corresponding row of the Pascal's triangle. If n <= 0, returns an empty list.
+    - triangle : a list of n sublists,  with integers in the row of triangle.
+    If n <= 0, returns an empty list.
     """
     if n <= 0:
         return []

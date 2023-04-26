@@ -4,13 +4,13 @@
 
 def pascal_triangle(n):
     """
-    Generates the Pascal's triangle up to n rows and returns it as a list of lists.
-    
+    creates a Pascal's triangle up to n rows and returns it as a list of list
+
     Args:
     - n (int): the number of rows in the triangle to generate.
     
     Returns:
-    - triangle (list of lists): a list of n sublists, each containing the integers in the corresponding row of the Pascal's triangle. If n <= 0, returns an empty list.
+    - triangle : a list of n sublists, each containing the integers in the corresponding row of the Pascal's triangle. If n <= 0, returns an empty list.
     """
     if n <= 0:
         return []

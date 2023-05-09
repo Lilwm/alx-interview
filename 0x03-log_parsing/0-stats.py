@@ -5,66 +5,45 @@ After every 10 lines and/or a keyboard interruption. keyboard prints
     - Total file size:i.e sum of all previous <file size>
     - Number of lines by status code(asc)
 """
-
 import sys
-from collections import defaultdict
 
 
-def compute_metrics():
+def print_stats():
+    """log parsing script
+    Args:
+    Returns: total size, status code lines
     """
-    reads from stdin and prints metrics every 10 lines or on Ctrl+C.
-    """
-    # initialize variables
-    total_size = 0
-    status_counts = defaultdict(int)
-    line_count = 0
-
     try:
-        # loop over input lines
+        # Initialize variables
+        file_size = 0
+        status_codes = {'200': 0, '301': 0, '400': 0, '401': 0,
+                        '403': 0, '404': 0, '405': 0, '500': 0}
+        count = 0
+        # Read from standard input
         for line in sys.stdin:
-            line = line.strip()
-
-            # parse input line
+            count += 1
+            tokens = line.split()
             try:
-                _, _, _, status_code, file_size = line.split()
-                status_code = int(status_code)
-                file_size = int(file_size)
-            except ValueError:
-                # skip line if it doesn't match expected format
-                continue
-
-            # update metrics
-            total_size += file_size
-            status_counts[status_code] += 1
-            line_count += 1
-
-            # print metrics every 10 lines or on keyboard interrupt
-            if line_count % 10 == 0:
-                print(f'Total file size: {total_size}')
-
-                for status_code in sorted(status_counts):
-                    print(f'{status_code}: {status_counts[status_code]}')
-
-            # handle keyboard interrupt
+                file_size += int(tokens[8])
+            except FileNotFoundError:
+                pass
+            # Check if line has all expected fields
             try:
-                sys.stdin.flush()
-            except KeyboardInterrupt:
-                print(f'Total file size: {total_size}')
-
-                for status_code in sorted(status_counts):
-                    print(f'{status_code}: {status_counts[status_code]}')
-
-                sys.exit(0)
-
+                status_codes[tokens[7]] += 1
+            except FileNotFoundError:
+                pass
+            if count % 10 == 0:
+                print("File size: {:d}".format(file_size))
+                for key, value in sorted(status_codes.items()):
+                    if value != 0:
+                        print("{:s}: {:d}".format(key, value))
+        print("File size: {:d}".format(file_size))
+        for key, value in sorted(status_codes.items()):
+            if value != 0:
+                print("{:s}: {:d}".format(key, value))
     except KeyboardInterrupt:
-        # handle keyboard interrupt
-        print(f'Total file size: {total_size}')
-
-        for status_code in sorted(status_counts):
-            print(f'{status_code}: {status_counts[status_code]}')
-
-        sys.exit(0)
+        pass
 
 
-if __name__ == '__main__':
-    compute_metrics()
+if __name__ == "__main__":
+    print_stats()

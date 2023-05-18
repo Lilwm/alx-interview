@@ -4,6 +4,7 @@
     encoding.
 """
 
+
 def validUTF8(data):
   """
   Determines if a given data set represents a valid UTF-8 encoding.
@@ -14,20 +15,25 @@ def validUTF8(data):
   Returns:
     True if data is a valid UTF-8 encoding, else return False.
   """
-  count = 0
+  
+  remaining_bytes = 0
 
   for integer in data:
-        if count == 0:
+        # Check utf-8 first Byte header
+        if remaining_bytes == 0:
+            #check 2 bytes
             if integer >> 5 == 0b110 or integer >> 5 == 0b1110:
-                count = 1
+                remaining_bytes = 1
+            #check 3 bytes
             elif integer >> 4 == 0b1110:
-                count = 2
+                remaining_bytes = 2
             elif integer >> 3 == 0b11110:
-                count = 3
+                remaining_bytes = 3
             elif integer >> 7 == 0b1:
                 return False
+        #check other bytes
         else:
             if integer >> 6 != 0b10:
                 return False
-            count -= 1
-  return count == 0
+            remaining_bytes -= 1
+  return remaining_bytes == 0

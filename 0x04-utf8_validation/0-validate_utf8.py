@@ -14,16 +14,6 @@ def validUTF8(data):
   Returns:
     True if data is a valid UTF-8 encoding, else return False.
   """
-  # Check if the data is empty.
-  if not data:
-    return False
-
-  # Check if the first byte is a valid start byte.
-  start_byte = data[0]
-  if not (start_byte & 0x80):
-    return False
-
-  # Check if the remaining bytes are valid continuation bytes.
   count = 0
 
   for integer in data:

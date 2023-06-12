@@ -13,38 +13,42 @@ const movieId = process.argv[2];
 
 // Send a GET request to the Star Wars API films endpoint
 const filmsUrl = `https://swapi.dev/api/films/${movieId}/`;
-request(filmsUrl, function (error, response, body) {
-  // Check for request errors
-  if (error) {
-    console.log(`Failed to retrieve movie information. Error: ${error.message}`);
-    process.exit(1);
-  }
-  // Check if the request was successful
-  if (response.statusCode !== 200) {
-    console.log(`Failed to retrieve movie information. Error: ${response.statusCode}`);
-    process.exit(1);
-  }
 
-  // Parse the response JSON
-  const data = JSON.parse(body);
-
-  // Retrieve the characters list from the film data
-  const characters = data.characters;
-
-  // Print the character names
-  characters.forEach(function (characterUrl) {
-    request(characterUrl, function (error, response, body) {
-      // Check for request errors
-      if (error) {
-        console.log(`Failed to retrieve character information. Error: ${error.message}`);
-        return;
-      }
-      if (response.statusCode === 200) {
-        const characterData = JSON.parse(body);
-        console.log(characterData.name);
+function fetchCharacters (url) {
+  return new Promise((resolve, reject) => {
+    request(url, function (error, response, body) {
+      if (error || response.statusCode !== 200) {
+        reject(error || new Error(`Failed to retrieve character information. Error: ${response.statusCode}`));
       } else {
-        console.log(`Failed to retrieve character information. Error: ${response.statusCode}`);
+        const filmData = JSON.parse(body);
+        resolve(filmData.characters);
       }
     });
   });
-});
+}
+
+function fetchCharacterData (url) {
+  return new Promise((resolve, reject) => {
+    request(url, function (error, response, body) {
+      if (error || response.statusCode !== 200) {
+        reject(error || new Error(`Failed to retrieve character information. Error: ${response.statusCode}`));
+      } else {
+        const characterData = JSON.parse(body);
+        resolve(characterData.name);
+      }
+    });
+  });
+}
+
+async function printCharacterNames () {
+  try {
+    const characterUrls = await fetchCharacters(filmsUrl);
+    const characterPromises = characterUrls.map(url => fetchCharacterData(url));
+    const characterNames = await Promise.all(characterPromises);
+    characterNames.forEach(name => console.log(name));
+  } catch (error) {
+    console.error(error.message);
+  }
+}
+
+printCharacterNames();
